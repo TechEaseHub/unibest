@@ -16,13 +16,13 @@ function updateMyMemberShortname(shortName: string) {
 }
 
 /** 更新用户头像 */
-function updateMyMemberAvatar(avatarUR: string) {
-    return http.get('updateMyMemberAvatar.json', { avatarUR })
+function updateMyMemberAvatar(avatarURL: string) {
+    return http.get('/updateMyMemberAvatar.json', { avatarURL })
 }
 
 /** 上传单个文件，获取图片url */
 function uploadOneFileToQiniu(fileBucketID: string) {
-    return http.get('uploadOneFileToQiniu.json', { fileBucketID })
+    return http.get('/uploadOneFileToQiniu.json', { fileBucketID })
 }
 
 export {

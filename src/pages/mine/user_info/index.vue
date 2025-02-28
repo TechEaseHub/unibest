@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import { getPropertyList } from '@/service/static/index'
-import { updateMyMemberPropertyID, updateMyMemberShortname } from '@/service/static/user'
+import { updateMyMemberAvatar, updateMyMemberPropertyID, updateMyMemberShortname } from '@/service/static/user'
 import { useUserStore } from '@/store/user'
 import { storeToRefs } from 'pinia'
 
@@ -21,6 +21,10 @@ onLoad(() => {
 // 图像
 // 计算属性，返回图片的路径
 const avatarSrc = computed(() => {
+  if (!userInfo.value.avatarURL) {
+    console.log('头像为空')
+    console.log(userInfo.value.avatarURL)
+  }
   return userInfo.value.avatarURL || 'https://imgs.699pic.com/images/500/465/562.jpg!list1x.v2'
 })
 
@@ -34,6 +38,10 @@ async function onEditAvatar() {
   console.log(avatarSrc.value)
   const imageData = await RunImageData()
   data.value = imageData
+  console.log('头像修改成功')
+  console.log(data.value)
+  updateMyMemberAvatar(data.value.filesURL)
+  userStore.RunGetOneMemberDetail()
 }
 
 // 昵称
