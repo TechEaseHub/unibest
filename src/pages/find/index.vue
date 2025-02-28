@@ -10,20 +10,20 @@
 <script setup lang="ts">
 // import { APPLICATIONID } from '/static/constant.ts'
 // import { useUserStore } from '/store/user.ts'
-import { useUserStore } from '@/store/user'
-import { useMessage } from '@/uni_modules/wot-design-uni'
+// import { useUserStore } from '@/store/user'
+// import { useMessage } from '@/uni_modules/wot-design-uni'
 import { onLoad } from '@dcloudio/uni-app'
-import { storeToRefs } from 'pinia'
+// import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import VehicleItem from './components/vehicle_item.vue'
 
-const message = useMessage()
+// const message = useMessage()
 const sequenceCode = ref('')
 const vList = ref([])
 const alertDialog = ref(null)
 
-const userStore = useUserStore()
-const { userInfo, loginInfo } = storeToRefs(userStore)
+// const userStore = useUserStore()
+// const { userInfo, loginInfo } = storeToRefs(userStore)
 
 onLoad(() => {
   getList()
@@ -34,23 +34,27 @@ function onBind() {
 }
 
 async function getList() {
-  const res = await get('/getVehicleList.json', {
-    applicationID: APPLICATIONID,
-    memberID: loginInfo.value.memberID,
-  })
-  vList.value = res.rows
+  // const res = await get('/getVehicleList.json', {
+  //   applicationID: APPLICATIONID,
+  //   memberID: loginInfo.value.memberID,
+  // })
+  // vList.value = res.rows
 }
 
 async function onSearch() {
-  const sessionID = uni.getStorageSync('loginInfo').sessionID
-  const res = await get('/getVehicleList.json', { sessionID, sequenceCode: sequenceCode.value })
-  if (!res.rows.length) {
-    // 弹窗
-    message.alert({
+  // const sessionID = uni.getStorageSync('loginInfo').sessionID
+  // const res = await get('/getVehicleList.json', { sessionID, sequenceCode: sequenceCode.value })
+  // if (!res.rows.length) {
+  //   // 弹窗
+  //   message.alert({
 
-    })
-    alertDialog.value.open()
-  }
+  //   })
+  //   alertDialog.value.open()
+  // }
+}
+
+function dialogClose() {
+  alertDialog.value.close()
 }
 
 function onFeature() {
