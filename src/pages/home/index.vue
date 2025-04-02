@@ -8,14 +8,14 @@
 </route>
 
 <script lang="ts" setup>
-import { getFocusPictureList, getNoticeArticleList } from '@/service/static'
+import StatusInfo from '@/pages/home/statusInfo.vue'
 
+import { getFocusPictureList, getNoticeArticleList } from '@/service/static'
 import ArticleWrap from './components/ArticleWrap.vue'
 import chengguan from './components/chengguan.vue'
 import SearchWrap from './components/SearchWrap.vue'
 
-// const { isChengguan } = storeToRefs(useUserStore())
-
+const { isLogined } = storeToRefs(useUserStore())
 // 轮播图
 const { data: PictureList } = useRequest(() => getFocusPictureList(), { immediate: true })
 const pictureList = computed(() => PictureList.value?.rows.map(i => i.picturePath))
@@ -48,6 +48,8 @@ function onNotice({ index, title }) {
       :delay="3"
       @click="onNotice"
     />
+
+    <StatusInfo v-if="isLogined" />
 
     <chengguan />
 

@@ -8,7 +8,10 @@
 </route>
 
 <script lang="ts" setup>
-import { createOneVehicleProcess, submObjectAttachment } from '@/service/static/move'
+import type * as Move from '@/service/static/move.type'
+import type * as Other from '@/service/static/other.type'
+import { createOneVehicleProcess } from '@/service/static/move'
+import { submObjectAttachment } from '@/service/static/other'
 import dayjs from 'dayjs'
 import { useMessage, useToast } from 'wot-design-uni'
 
@@ -18,9 +21,11 @@ const toast = useToast()
 // const { locationInfo } = storeToRefs(useOtherStore())
 // const { GetLocation } = useOtherStore()
 
-const { parkAreaList, handleParkArea, OneVehicleProcess } = storeToRefs(useMoveStore())
+const { parkAreaList, handleParkArea } = storeToRefs(useMoveStore())
 const { RunGetParkAreaList } = useMoveStore()
 const { loading, run: RunUpload } = useUpload({ fileBucketID: FILEBUCKETID })
+
+const OneVehicleProcess = ref()
 
 onLoad(() => {
   // GetLocation()
@@ -61,20 +66,23 @@ async function onNext() {
     return toast.warning('上传停车场违停照片')
 
   const VehicleProcessName = `挪车-${dayjs().format('YYYY-MM-DD HH:mm:ss')}`
+  const OneVehicleProcessParams = ref<Move.CreateOneVehicleProcessType | undefined>()
+  OneVehicleProcessParams.value = { name: VehicleProcessName }
   // 创建一个车辆处理记录
-  const { data, run } = useRequest(() => createOneVehicleProcess({
-    name: VehicleProcessName,
-  }))
+  const { data, run } = useRequest(() => createOneVehicleProcess(OneVehicleProcessParams.value))
   await run()
   OneVehicleProcess.value = data.value
 
-  // 上传图片附件
+  const AttachmentParams = ref<Other.IAttachmentParams | undefined>()
+  // 上传图片附
   const ReqList = panoramicPhotoList.value.map((src) => {
-    return submObjectAttachment({
+    AttachmentParams.value = {
       objectID: data.value.vehicleProcessId,
       objectName: VehicleProcessName,
       imageUrl: src,
-    })
+      objectDefineID: ObjectDefineIDEnum.挪车全景图,
+    }
+    return submObjectAttachment(AttachmentParams.value)
   })
 
   Promise.all(ReqList).then(() => {

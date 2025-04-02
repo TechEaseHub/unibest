@@ -1,74 +1,84 @@
-import { http } from '@/utils/http'
+import type * as Move from './move.type'
 
-export interface ParkArea {
-  parkAreaID: string
-  name: string
-  address: string
+/** 停车区列表 */
+export function getParkAreaList() {
+  return http.get<IPageData<Move.ParkAreaType>>('/getParkAreaList.json')
 }
-export function getParkAreaList(phone: string) {
-  return http.get<IPageData<ParkArea>>('/getParkAreaList.json', {
-    phone,
+
+export function getVehicleProcessList(switchDate: Move.ESwitchDate) {
+  const UserStore = useUserStore()
+  return http.get<IPageData<Move.VehicleProcessTyep>>('/getVehicleProcessList.json', {
+    sortTypeTime: 2,
+    memberID: UserStore.loginSession.memberID,
+    employeeID: UserStore.employee.employeeID,
+    switchDate,
   })
 }
 
-export interface ParkUnit {
-  parkUnitID: string
-  propertyID: string
-  name: string
-  code: string
-}
-export function getParkUnitList(phone: string) {
-  return http.get<IPageData<ParkUnit>>('/getParkUnitList.json', {
-    phone,
-  })
-}
-
-export interface VehicleProcess {
-  vehicleProcessId: string
-  name: string
-  employeeID: string | null
-  memberID: string | null
-
-  /** 出发时间 */
-  leftTime: string
-}
-export function getVehicleProcessList(params: {
-  memberID?: string
-  employeeID?: string
-} = {}) {
-  return http.get<IPageData<VehicleProcess>>('/getVehicleProcessList.json', {
-    sortTypeTime: 1,
-    pageNumber: 20,
+export function createOneVehicleProcess(params: Move.CreateOneVehicleProcessType) {
+  return http.get<{ vehicleProcessId: string }>('/createOneVehicleProcess.json', {
+    memberID: useUserStore().loginSession.memberID,
+    employeeID: useUserStore().employeeID,
     ...params,
   })
 }
 
-export function createOneVehicleProcess(params: {
-  name: string
-}) {
-  return http.get<VehicleProcess>('/createOneVehicleProcess.json', {
+/** 获取车辆违章记录列表 */
+export function getVehicleViolationList(vehicleProcessID: string) {
+  return http.get<IPageData<{ vehicleID: string }>>('/getVehicleViolationList.json', {
+    status: '1',
+    sortTypeTime: '2',
+    vehicleProcessID,
+  })
+}
+
+/** 开始一个车辆处理 */
+export function beginOneVehicleProcess(vehicleProcessID: string) {
+  return http.get('/beginOneVehicleProcess.json', {
+    vehicleProcessID,
+  })
+}
+
+/** 创建一个违停记录 */
+export function createOneVehicleViolation(params?: Move.CreateVehicleViolationParams) {
+  return http.get('/createOneVehicleViolation.json', {
     ...params,
   })
 }
 
-export function beginOneVehicleProcess(params: {
-  vehicleProcessID: string // createOneVehicleProcess响应的ID
-}) {
-  return http.get<VehicleProcess>('/beginOneVehicleProcess.json', {
+/** 离开一个车辆处理记录 */
+export function leftOneVehicleProcess(vehicleProcessID: string) {
+  return http.get('/leftOneVehicleProcess.json', {
+    vehicleProcessID,
+  })
+}
+
+/**
+ * 到达一个车辆处理记录
+ * - 到了新的停车场调用
+ */
+export function arrivedOneVehicleProcess(vehicleProcessID: string) {
+  return http.get('/arrivedOneVehicleProcess.json', {
+    vehicleProcessID,
+  })
+}
+
+/**
+ * 处置一个车辆违章记录
+ * - 获取车辆违章记录列表后，城管把车子放下来循环拍照，对每个车子的违章记录进行修改
+ */
+export function processOneVehicleViolation(params: Move.ProcessOneVehicleViolationType) {
+  return http.get('/processOneVehicleViolation.json', {
     ...params,
   })
 }
 
-export function submObjectAttachment(params: {
-  objectID: string
-  objectName: string
-  objectDefineID?: string
-  imageUrl: string
-  name?: string
-}) {
-  return http.get<IPageData<ParkArea>>('/submObjectAttachment.json', {
-    objectDefineID: '8a2f462a9473d8b401947d736c0a0428',
-    name: '开始全景图',
-    ...params,
+/**
+ * 结束一个车辆处理记录
+ * - 处置违章记录完成调用的接口
+ */
+export function endOneVehicleProcess(vehicleProcessID: string) {
+  return http.get('/endOneVehicleProcess.json', {
+    vehicleProcessID,
   })
 }

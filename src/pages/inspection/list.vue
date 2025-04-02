@@ -14,10 +14,15 @@ import { createOneRouteInstance } from '@/service/static/inspection'
 import dayjs from 'dayjs'
 import headerWrap from './components/headerWrap.vue'
 
-const { HandleRouteDefine, routeInstanceList, handleRouteInstanceIdx, HeaderOptions } = storeToRefs(useInspection())
+const { HandleRouteDefine, routeInstanceList, handleRouteInstanceIdx, HeaderOptions, RouteInstanceParams } = storeToRefs(useInspection())
 const { RunGetRouteInstanceList, UnLoadRouteInstance } = useInspection()
 
-onLoad(() => RunGetRouteInstanceList())
+onLoad(() => {
+  RouteInstanceParams.value = {
+    routeDefineID: HandleRouteDefine.value.value,
+  }
+  RunGetRouteInstanceList()
+})
 onUnload(() => UnLoadRouteInstance())
 
 async function createOneRoute() {

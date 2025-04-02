@@ -1,8 +1,11 @@
+import type * as Inspection from '@/service/static/inspection.type'
 import {
   getRouteDefineList,
   getRouteInstanceDotList,
   getRouteInstanceList,
 } from '@/service/static/inspection'
+
+import dayjs from 'dayjs'
 
 export const useInspection = defineStore(
   'inspection',
@@ -41,12 +44,8 @@ export const useInspection = defineStore(
     }
 
     // 巡视实例
-    const {
-      data: RouteInstanceList,
-      run: RunGetRouteInstanceList,
-    } = useRequest(() => getRouteInstanceList({
-      routeDefineID: HandleRouteDefine.value.value,
-    }))
+    const RouteInstanceParams = ref<Inspection.IRouteInstanceParam | undefined>()
+    const { data: RouteInstanceList, run: RunGetRouteInstanceList } = useRequest(() => getRouteInstanceList(RouteInstanceParams.value))
     const handleRouteInstanceIdx = ref<number | undefined>(undefined)
     const routeInstanceList = computed(() => {
       return RouteInstanceList.value?.rows?.map((i) => {
@@ -114,6 +113,7 @@ export const useInspection = defineStore(
       console.log('离开路线  =》 实例  =》  检查点')
       RouteInstanceDotList.value = undefined
       handleRouteInstanceIdx.value = undefined
+      toDayUserInstanceAndMoveList()
       UnLoadDot()
     }
 
@@ -131,6 +131,41 @@ export const useInspection = defineStore(
       ]
     })
 
+    //
+    const instanceExectionNum = ref(0)
+
+    // 获取今天当天用户巡视、挪车列表
+    async function toDayUserInstanceAndMoveList() {
+      console.log('获取今天当天用户巡视、挪车列表')
+      RouteInstanceParams.value = {
+        beginTime: `${dayjs().format('YYYY-MM-DD')} 00:00:00`,
+        endTime: `${dayjs().add(1, 'day').format('YYYY-MM-DD')} 00:00:00`,
+      }
+
+      const instanceNum = ref(0)
+      console.log('RouteInstanceParams', RouteInstanceParams.value)
+      // 获取今日巡视路线
+      await RunGetRouteInstanceList()
+      instanceNum.value = RouteInstanceList.value.rows?.length
+      console.log('routeInstance', RouteInstanceList.value)
+
+      const temporaryDotNum = ref(0)
+      // 异常次数
+      for (let i = 0; i < RouteInstanceList.value.rows.length; i++) {
+        handleRouteInstanceIdx.value = i
+        await RunGetRouteInstanceDotList()
+        // 目前type 2 异常
+        RouteInstanceDotList.value?.rows?.forEach((item) => {
+          if (item.resultType === '2') {
+            temporaryDotNum.value++
+          }
+        })
+
+        console.log('routeInstanceDot', RouteInstanceDotList.value)
+      }
+      instanceExectionNum.value = temporaryDotNum.value
+    }
+
     return {
       // 路线定义
       RouteDefine,
@@ -141,9 +176,10 @@ export const useInspection = defineStore(
       UnLoadRouteDefine,
 
       // 巡视实例
+      RouteInstanceParams,
+      RunGetRouteInstanceList,
       RouteInstanceList,
       routeInstanceList,
-      RunGetRouteInstanceList,
       handleRouteInstanceIdx,
       HandleRouteInstance,
       UnLoadRouteInstance,
@@ -159,6 +195,8 @@ export const useInspection = defineStore(
       UnLoadDot,
 
       HeaderOptions,
+      toDayUserInstanceAndMoveList,
+      instanceExectionNum,
     }
   },
   {

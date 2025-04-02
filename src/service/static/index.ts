@@ -104,7 +104,13 @@ function getPropertyList() {
   return http.get<IPageData<CommunityAddress>>('/getPropertyList', { applicationID: APPLICATIONID })
 }
 
+/** 获取挪车消息 */
+function getMessageList(iLoginSession: ILoginSession) {
+  return http.get<IPageData<object>>('/getMessageList.json', { sessionID: iLoginSession.sessionID, receiverMemberID: iLoginSession.memberID })
+}
+
 export {
+  getMessageList,
   getParkList,
   getPropertyList,
   getReleaseVehicleList,
