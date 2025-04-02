@@ -17,6 +17,9 @@ const {
   HandleRouteInstance,
   handleRouteInstanceDotIdx,
   HeaderOptions,
+
+  HandleRouteDefine,
+  RouteInstanceParams,
 } = storeToRefs(useInspection())
 const {
   RunGetRouteInstanceDotList,
@@ -34,12 +37,19 @@ async function onReadBegin() {
   await beginOneRouteInstance({
     routeInstanceID: HandleRouteInstance.value.id,
   })
+
+  RouteInstanceParams.value = {
+    routeDefineID: HandleRouteDefine.value.value,
+  }
   await RunGetRouteInstanceList()
 }
 async function onRealEnd() {
   await endOneRouteInstance({
     routeInstanceID: HandleRouteInstance.value.id,
   })
+  RouteInstanceParams.value = {
+    routeDefineID: HandleRouteDefine.value.value,
+  }
   await RunGetRouteInstanceList()
 }
 

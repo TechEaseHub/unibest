@@ -1,39 +1,57 @@
-import { beginOneVehicleProcess } from '@/service/static/move'
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import type { CreateVehicleViolationParams } from '@/service/static/move.type'
+import * as MoveAPI from '@/service/static/move'
 
-export const useMoveTask = defineStore(
+export const useMoveTaskStore = defineStore(
   'moveTask',
   () => {
-    /** 当前 车辆处理任务的 ID */
-    const vehicleProcessID = ref<string>('')
+    const { HandleVehicleProcess, VehicleProcessList, handleVehicleProcess } = storeToRefs(useMoveStore())
+
+    watch(VehicleProcessList.value, () => {
+      // 4=开始任务 5=离开原地点 6=到达新地点
+      // 获取违停车辆数量
+      ViolationNum.value = 0
+      VehicleProcessList.value.rows?.forEach(async (item) => {
+        handleVehicleProcess.value = item.vehicleProcessID
+        await RunGetViolationList()
+        ViolationNum.value += ViolationList.value.rows?.length
+      })
+    })
+
+    // 挪车车辆数量
+    const ViolationNum = ref(0)
 
     /**
-     * vehicleProcessID: 2638816f24ec4705b34dbc69a45ee1cf
-     * beginTime: 2025-03-03 11:15:56
+     * 查询违停记录
+     * - 根据 vehicleID 查询车辆详情
+     * - 显示车辆卡片
      */
-    const { data: BeginOneVehicleProcess, run: RunBeginOneVehicleProcess } = useRequest(() => beginOneVehicleProcess({
-      vehicleProcessID: vehicleProcessID.value,
-    }))
+    const {
+      data: ViolationList,
+      run: RunGetViolationList,
+    } = useRequest(() => MoveAPI.getVehicleViolationList(HandleVehicleProcess.value.vehicleProcessID))
 
-    const moveImg = ref([
-      { id: '', label: '拍摄车牌', src: '', placeholder: '/static/img/move/front_outline.png' },
-      { id: '', label: '拍摄后面', src: 'http://3onepicture.3onedataqz.com/eda7327a142c4bd5995a8e7be4c3fb3c.jpg', placeholder: '/static/img/move/back_outline.png' },
-      { id: '', label: '拍摄侧面', src: '', placeholder: '/static/img/move/flank_outline.png' },
-      { id: '', label: '拍摄前面', src: '', placeholder: '/static/img/move/front_outline.png' },
-    ])
+    /** 创建违停参数 */
+    const violationParams = ref<CreateVehicleViolationParams | undefined>()
+    const { data: CreateOneVehicleViolation, run: RunCreateOneVehicleViolation } = useRequest(() =>
+      MoveAPI.createOneVehicleViolation(violationParams.value),
+    )
+
+    const { data: BeginOneVehicleProcess, run: RunBeginOneVehicleProcess } = useRequest(() =>
+      MoveAPI.beginOneVehicleProcess(HandleVehicleProcess.value.id),
+    )
 
     return {
-      vehicleProcessID,
+      ViolationList,
+      RunGetViolationList,
 
-      // 开始车辆处理
+      CreateOneVehicleViolation,
+      violationParams,
+      RunCreateOneVehicleViolation,
+
       BeginOneVehicleProcess,
       RunBeginOneVehicleProcess,
-
-      moveImg,
+      ViolationNum,
     }
   },
-  {
-    persist: true,
-  },
+  { persist: true },
 )

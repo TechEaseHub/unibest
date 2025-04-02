@@ -40,6 +40,8 @@ export function getMyMemberMajorList() {
 export interface CompanyAndEmployee {
   employeeID: string
   employeeName: string
+  companyID: string
+  companyName: string
 }
 /** 查询所属公司 */
 export function getMyCompanyAndEmployeeList() {

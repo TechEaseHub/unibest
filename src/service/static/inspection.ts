@@ -1,3 +1,4 @@
+import type * as Inspection from './inspection.type'
 import { http } from '@/utils/http'
 import dayjs from 'dayjs'
 
@@ -23,16 +24,7 @@ export function getRouteDefineList() {
  * @param params.sortTypeTime 时间排序类型（1: 升序, 2: 降序）
  * @returns 包含巡视实例列表的Promise对象
  */
-export function getRouteInstanceList(params: {
-  /** 路线定义ID */
-  routeDefineID: string
-  /** 会员ID（可选） */
-  memberID?: string
-  /** 员工ID（可选） */
-  employeeID?: string
-  /** 时间排序类型（1: 升序, 2: 降序） */
-  sortTypeTime?: 1 | 2
-}) {
+export function getRouteInstanceList(params: Inspection.IRouteInstanceParam) {
   return http.get<IPageData<{
     /** 巡视实例ID */
     routeInstanceID: string

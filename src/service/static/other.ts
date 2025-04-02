@@ -1,4 +1,4 @@
-import type { ObjectDefineIDEnum } from '@/hooks/constants'
+import type * as Other from './other.type'
 import { http } from '@/utils/http'
 
 /**
@@ -16,60 +16,22 @@ export function getObjectAttachmentList(params: {
   })
 }
 
-export interface Employee {
-  employeeID: string
-  name: string
-  phone: string
-  code: string
-  orderSeq: number
-  titleID: string
-  titleName: string
-  age: number
-  departmentID: string
-  departmentName: string
-  jobID: string
-  jobName: string
-  joinDate: number
-  joinDateStr: Date
-  jobStatus: number
-  payType: number
-  memberID: string
-}
-
+/**
+ * 获取员工列表
+ * @param params  请求参数对象
+ * @param params.companyID - 对象标识符枚举，用于指定要查询的关联对象类型或实例
+ * @returns 返回IpageData格式的员工列表数据
+ */
 export function getEmployeeList(params?: {
   companyID?: string
 }) {
-  return http.get<IPageData<Employee>>('/getEmployeeList.json', {
+  return http.get<IPageData<Other.IEmployee>>('/getEmployeeList.json', {
     companyID: COMPANYID,
     ...params,
   })
 }
 
-interface AttachmentParams {
-  /**
-   * 对象定义ID
-   * - 意见反馈: 8a2f462a5ebc4863015ebc755ff70455
-   * - 巡视点检查: 8a2f462a926b2ea701926b4bb6b7003c
-   * - 挪车全景图: 8a2f462a9473d8b401947d736c0a0428
-   */
-  objectDefineID: ObjectDefineIDEnum
-  /**
-   * 对象ID
-   * - 意见反馈: feedID
-   * - 巡视点检查: routeInstanceDotID
-   * - 挪车全景图: vehicleProcessId
-   */
-  objectID: string
-  /** 对象ID 对应的名称 */
-  objectName: string
-  /** 图片附件地址 */
-  imageUrl: string
-  // /** 写死='1'？ */
-  // fileType: '1'
-  // /** 写死='1'？ */
-  // showType: '1'
-}
-export function submObjectAttachment(params: AttachmentParams) {
+export function submObjectAttachment(params: Other.IAttachmentParams) {
   return http.get('/submObjectAttachment.json', {
     ...params,
   })

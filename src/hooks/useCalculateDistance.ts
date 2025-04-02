@@ -2,6 +2,7 @@ interface Location {
   lat: number
   lon: number
   distance?: number
+  address?: string
 }
 /**
  * 将角度转换为弧度

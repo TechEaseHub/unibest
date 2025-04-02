@@ -1,4 +1,8 @@
 import {
+  getMessageList,
+} from '@/service/static/index'
+
+import {
   bandingEmployeeWithPhone,
   getMyCompanyAndEmployeeList,
   getMyMemberMajorList,
@@ -120,12 +124,19 @@ export const useUserStore = defineStore(
       return {
         id: MyCompanyAndEmployeeList.value?.[0]?.employeeID ?? '',
         name: MyCompanyAndEmployeeList.value?.[0]?.employeeName ?? '',
+        employeeID: MyCompanyAndEmployeeList.value?.[0]?.employeeID ?? '',
+        employeeName: MyCompanyAndEmployeeList.value?.[0]?.employeeName ?? '',
+        companyID: MyCompanyAndEmployeeList.value?.[0]?.companyID ?? '',
+        companyName: MyCompanyAndEmployeeList.value?.[0]?.companyName ?? '',
       }
     })
     const employeeID = computed(() => MyCompanyAndEmployeeList.value?.[0]?.employeeID ?? '')
 
     // 头像
     const avatarURL = computed(() => OneMemberDetail.value?.avatarURL || 'https://imgs.699pic.com/images/500/465/562.jpg!list1x.v2')
+
+    // 用户是否非法停车
+    const { data: userIllegalityPollUp, run: getUserIllegalityPollUp } = useRequest(() => getMessageList(loginSession.value))
 
     return {
       openID,
@@ -147,6 +158,9 @@ export const useUserStore = defineStore(
       employeeID,
 
       avatarURL,
+
+      userIllegalityPollUp,
+      getUserIllegalityPollUp,
 
     }
   },

@@ -10,6 +10,13 @@ onLaunch(async () => {
   if (userStore.isLoginExpired) {
     await userStore.handleAuth('wxLogin')
   }
+
+  const userInspection = useInspection()
+  userInspection.toDayUserInstanceAndMoveList()
+
+  const userMove = useMoveStore()
+  userMove.RunGetParkAreaList()
+  userMove.RunGetVehicleProcessList()
 })
 
 onShow(() => {

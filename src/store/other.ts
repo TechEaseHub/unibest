@@ -52,9 +52,10 @@ export const useOtherStore = defineStore(
       uni.getLocation({
         success: (res) => {
           console.log('获取位置成功：', res)
-          locationInfo.value.latitude = res.latitude
-          locationInfo.value.longitude = res.longitude
-          locationInfo.value.address = res.address
+          locationInfo.value = res
+          // locationInfo.value.latitude = res.latitude
+          // locationInfo.value.longitude = res.longitude
+          // locationInfo.value.address = res.address
         },
         fail: (err) => {
           console.error('获取位置失败：', err)
